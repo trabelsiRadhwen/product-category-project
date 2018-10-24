@@ -1,3 +1,18 @@
+catgories:
+    type:     rest
+    prefix: /api
+    resource: '@ApiBundle/Controller/CategoryApiController.php'
+
+products:
+    type:     rest
+    prefix: /api
+    resource: '@ApiBundle/Controller/ProductApiController.php'
+
+api:
+    resource: "@ApiBundle/Controller/"
+    type:     annotation
+    prefix:   /
+
 grocery:
     resource: "@GroceryBundle/Controller/"
     type:     annotation
