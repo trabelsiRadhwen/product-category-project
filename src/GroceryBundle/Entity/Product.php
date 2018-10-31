@@ -2,12 +2,17 @@
 
 namespace GroceryBundle\Entity;
 
+use DateTime;
 use Doctrine\ORM\Mapping as ORM;
+
+use Symfony\Component\HttpFoundation\File\File;
+use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
 /**
  * Product
  *
  * @ORM\Table(name="product")
+ * @Vich\Uploadable
  * @ORM\Entity(repositoryClass="GroceryBundle\Repository\ProductRepository")
  */
 class Product
@@ -27,6 +32,24 @@ class Product
      * @ORM\Column(name="product", type="string", length=255)
      */
     private $product;
+
+    /**
+     * @ORM\Column(type="datetime")
+     * @var \DateTime
+     */
+    private $updatedAt;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     * @var string
+     */
+    private $image;
+
+    /**
+     * @Vich\UploadableField(mapping="product_images", fileNameProperty="image")
+     * @var File
+     */
+    private $imageFile;
 
     /**
      * @var string
@@ -148,6 +171,43 @@ class Product
     public function setCategory($category)
     {
         $this->category = $category;
+    }
+
+    /**
+     * @return string
+     */
+    public function getImage()
+    {
+        return $this->image;
+    }
+
+    /**
+     * @param string $image
+     */
+    public function setImage($image)
+    {
+        $this->image = $image;
+    }
+
+    /**
+     * @return File
+     */
+    public function getImageFile()
+    {
+        return $this->imageFile;
+    }
+
+    /**
+     * @param File $imageFile
+     */
+    public function setImageFile(File $image = null)
+    {
+        $this->imageFile = $image;
+
+        if ($image)
+        {
+            $this->updatedAt = new \DateTime('now');
+        }
     }
 
     public function __toString()

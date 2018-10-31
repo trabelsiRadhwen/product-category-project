@@ -33,3 +33,9 @@ services:
     # AppBundle\Service\ExampleService:
     #     arguments:
     #         $someArgument: 'some_value'
+
+
+
+    data_fixture.fixture:
+        class: GroceryBundle\DataFixtures\ORM\LoadFixtures
+        tags: [doctrine.fixture.orm]

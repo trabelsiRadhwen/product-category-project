@@ -9,6 +9,7 @@ imports:
 # https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
     locale: en
+    app.path.product_images: /uploads/images/products
 
 framework:
     #esi: ~
@@ -68,6 +69,14 @@ swiftmailer:
     password: '%mailer_password%'
     spool: { type: memory }
 
+#vich_image_file_uploader
+vich_uploader:
+    db_driver: orm
+    mappings:
+        product_images:
+            uri_prefix:         '%app.path.product_images%'
+            upload_destination: '%kernel.root_dir%/../web%app.path.product_images%'
+
 # FOSREStBundle config
 
 fos_rest:
@@ -80,3 +89,113 @@ fos_rest:
             - { path: '^/api', priorities: ['json'], fallback_format: 'json' }
             - { path: '^/', priorities: [ 'text/html', '*/*'], fallback_format: html, prefer_extension: true }
             - { path: '^/admin', methods: [ 'GET', 'POST'], priorities: [ 'xml', 'html'], fallback_format: ~, prefer_extension: false }
+
+
+#EasyAdminBundle Configuration
+easy_admin:
+  site_name: 'GROCERY'
+  design:
+      brand_color: '#29B6F6'
+      color_scheme: 'light'
+      menu:
+          - Product
+          - Category
+          - User
+  entities:
+      User:
+          class: GroceryBundle\Entity\User
+          form:
+              fields:
+                  - username
+                  - email
+                  - enabled
+                  - lastLogin
+                  # if administrators are allowed to edit users' passwords and roles, add this:
+                  - { property: 'plainPassword', type: 'text', type_options: { required: false } }
+                  - { property: 'roles', type: 'choice', type_options: { multiple: true, choices: { 'ROLE_USER': 'ROLE_USER', 'ROLE_ADMIN': 'ROLE_ADMIN' } } }
+          list:
+              title: Users
+              fields:
+                - id
+                - username
+                - email
+                - enabled
+                - roles
+                - { property: 'lastLogin',type: 'datetime' ,format: 'l jS F Y g:ia'}
+              actions:
+                - { name: 'show', icon: 'search', label: 'Show'}
+                - { name: 'new', icon: 'plus', label: 'Add'}
+                - { name: 'delete', icon: 'trash', label: 'Delete'}
+                - { name: 'edit', icon: 'pencil', label: 'Edit'}
+
+          new:
+              title: Ajouter nouveau utilisateur
+          edit:
+              title: Modifier l'utilisateur
+
+      Product:
+          class: GroceryBundle\Entity\Product
+          form:
+              fields:
+                - product
+                - libelle
+                - price
+                - category
+                - { property: 'imageFile', type: 'vich_image' }
+          list:
+              title: Products
+              fields:
+                - id
+                - product
+                - libelle
+                - price
+                - category
+                - { property: 'image', type: 'image', base_path: '%app.path.product_images%' }
+              actions:
+                - { name: 'show', icon: 'search', label: 'Show'}
+                - { name: 'new', icon: 'plus', label: 'Add'}
+                - { name: 'delete', icon: 'trash', label: 'Delete'}
+                - { name: 'edit', icon: 'pencil', label: 'Edit'}
+          search:
+              title: Search
+          new:
+              title: Ajouter nouveau produit
+              form_options: { validation_groups: ['Default', 'Customer'] }
+          edit:
+              title: Modifier produit
+          show:
+              title: Product
+              fields:
+                - id
+                - product
+                - libelle
+                - price
+                - category
+                - { property: 'image', type: 'image', base_path: '%app.path.product_images%' }
+
+      Category:
+          class: GroceryBundle\Entity\Category
+          list:
+              title: Categories
+              actions:
+                - { name: 'show', icon: 'search', label: 'Show'}
+                - { name: 'new', icon: 'plus', label: 'Add'}
+                - { name: 'delete', icon: 'trash', label: 'Delete'}
+                - { name: 'edit', icon: 'pencil', label: 'Edit'}
+          new:
+              title: Ajouter nouvelle categorie
+              form_options: { validation_groups: ['Default', 'Customer'] }
+          edit:
+              title: Modifier categorie
+
+
+#fos user bundle config
+fos_user:
+    db_driver: orm # other valid values are 'mongodb' and 'couchdb'
+    firewall_name: main
+    user_class: GroceryBundle\Entity\User
+    service:                               # this lines
+        mailer: fos_user.mailer.twig_swift
+    from_email:
+        address: "radhwen.6tr@gmail.com"
+        sender_name: "Grocery"
